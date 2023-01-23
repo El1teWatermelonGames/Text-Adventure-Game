@@ -50,12 +50,12 @@ class player:
     def loadData(self, name):
         saveFile = open(name+".save", "r")
 
-        load(self.name, saveFile)
-        load(self.damage, saveFile)
-        load(self.health, saveFile)
-        load(self.defense, saveFile)
-        load(self.exp, saveFile)
-        load(self.inventory, saveFile)
+        self.name = load(self.name, saveFile)
+        self.damage = load(self.damage, saveFile)
+        self.health = load(self.health, saveFile)
+        self.defense = load(self.defense, saveFile)
+        self.exp = load(self.exp, saveFile)
+        self.inventory = load(self.inventory, saveFile)
 
         saveFile.close()
 
