@@ -17,6 +17,12 @@ COLOR = {
     "reset": "\u001b[0m"
 }
 
+def clearConsole():
+	if os.name == "nt":
+		os.system("cls")
+	else:
+		os.system("clear")
+        
 class player:
     def editName(self, newName):
         self.name = newName
@@ -28,7 +34,15 @@ class player:
         pass
 
     def printData(self):
-        pass
+        print(f"""
+        Name      | {self.name}
+        Weapon    | {self.weapon}
+        Health    | {self.health}
+        Armor     | {self.armor}
+        Exp       | {self.exp}
+        Inventory | {self.inventory}
+        Location  | {self.curloc}
+        """)
 
     def saveData(self):
         if os.path.exists(savesDir+self.name+"-save.json"):
@@ -135,11 +149,14 @@ def init():
 
     while(True):
         if saveDataSelected: print(f"Current save selected: {player.name}")
-        print("Would you like to:\n1. Create a save\n2. Load a save")
+        print("Would you like to:\nq. Exit the game\n1. Create a save\n2. Load a save")
         if saveDataSelected: print("3. View current save data\n4. Start Game")
         selection = input("\n")
 
-        if selection == "1":
+        if selection == "q":
+            exit(0)
+
+        elif selection == "1":
             saveDataSelected = True
             newSaveMenu()
 
@@ -148,13 +165,16 @@ def init():
             loadSaveMenu()
 
         elif saveDataSelected and selection == "3":
-            pass
+            player.printData(player)
 
         elif saveDataSelected and selection == "4":
-            pass
+            game()
 
         else:
             print(COLOR["red"]+"Not a valid option!"+COLOR["reset"])
+
+def game():
+    pass
     
 if __name__ == "__main__":
     init()
