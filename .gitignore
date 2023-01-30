@@ -1,5 +1,9 @@
 .vscode/
+venv/
 
 .c/
 .cpp/
 .cs/
+
+.replit
+replit.nix
