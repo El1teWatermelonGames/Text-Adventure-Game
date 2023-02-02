@@ -2,12 +2,14 @@ from os import path, mkdir, scandir
 from json import dumps, loads
 from global_constants import COLOR
 saveDir = "saves/"
-fileExt = "_save.json"
+saveExt = "_save.json"
+worldDir = "worlds"
+worldExt = "_world.py"
 if not path.exists(saveDir):
     mkdir(saveDir)
 
 def newSave(name) -> int:
-    saveName = saveDir + name + fileExt
+    saveName = saveDir + name + saveExt
     if path.exists(saveName):
         while True:
             selection = input(COLOR["red"] + f"Save data with this name ({name}) already exists, do you want to overwrite it (y/n): " + COLOR["reset"]).lower().strip(' ')
@@ -33,7 +35,7 @@ def newSave(name) -> int:
     return 0
 
 def savePlayerData(p) -> int:
-    saveName = saveDir + p.name + fileExt
+    saveName = saveDir + p.name + saveExt
     saveDict = {
         "name": p.name,
         "health": p.health,
@@ -51,7 +53,7 @@ def savePlayerData(p) -> int:
     return 0
 
 def loadPlayerData(name) -> dict:
-    saveName = saveDir + name + fileExt
+    saveName = saveDir + name + saveExt
     try:
         with open(saveName, "r") as save:
             saveDict = loads(' '.join(save.readlines()).replace("\n", ""))
@@ -65,8 +67,18 @@ def showSaves() -> None:
     print("Listed below are all your saves:")
     numOfValidSaves = 0
     for path in scandir(saveDir):
-        if path.is_file() and path.name.endswith("_save.json"):
+        if path.is_file() and path.name.endswith(saveExt):
             numOfValidSaves += 1
-            print(COLOR["blue"] + path.name.rstrip("_save.json") + COLOR["reset"])
+            print(COLOR["blue"] + path.name.rstrip(saveExt) + COLOR["reset"])
     if numOfValidSaves == 0:
         print(COLOR["red"]+"No saves found!"+COLOR["reset"])
+
+def showWorlds() -> None:
+    print("Listed below are all your installed worlds:")
+    numofValidWorlds = 0
+    for path in scandir(worldDir):
+        if path.is_file() and path.name.endswith(worldExt):
+            numofValidWorlds += 1
+            print(COLOR["blue"] + path.name.rstrip(worldExt) + COLOR["reset"])
+    if numofValidWorlds == 0:
+        print(COLOR["red"]+"No worlds found!"+COLOR["reset"])

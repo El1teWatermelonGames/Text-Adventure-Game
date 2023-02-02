@@ -5,8 +5,9 @@
 
 
 # Internal dependencies
-from global_constants import COLOR, clearConsole
-from save_load import newSave, savePlayerData, loadPlayerData, showSaves
+from global_constants import clearConsole
+from save_load import newSave, loadPlayerData, showSaves, showWorlds
+from engine import entry
 
 
 # Initialization
@@ -47,6 +48,18 @@ class playerSave:
         self.lv = playerDict["lv"]
         self.curloc = playerDict["curloc"]
 
+    def exportDataToDict(self) -> dict:
+        return {
+            "name": self.name,
+            "health": self.health,
+            "weapon": self.weapon,
+            "armor": self.armor,
+            "inventory": self.inventory,
+            "exp": self.exp,
+            "lv": self.lv,
+            "curloc": self.curloc
+        }
+
 
 def main(saveDataSelected = False):
     while(True):
@@ -75,7 +88,9 @@ def main(saveDataSelected = False):
             playerSave.check(playerSave)
 
         elif saveDataSelected and selection == "4":
-            pass
+            showWorlds()
+            worldName = input("\nEnter the name of the world you want to play: ")
+            entry(worldName, playerSave.exportDataToDict(playerSave))
         
         if playerSave.name != None: saveDataSelected = True
 
