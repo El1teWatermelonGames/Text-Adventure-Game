@@ -1,14 +1,17 @@
 from os import path, mkdir, scandir
 from json import dumps, loads
 from global_constants import COLOR
+from engine import items
 saveDir = "saves/"
 saveExt = "_save.json"
 worldDir = "worlds"
 worldExt = "_world.py"
 if not path.exists(saveDir):
     mkdir(saveDir)
+if not path.exists(worldDir):
+    mkdir(worldDir)
 
-def newSave(name) -> int:
+def newSave(name: str) -> int:
     saveName = saveDir + name + saveExt
     if path.exists(saveName):
         while True:
@@ -21,8 +24,8 @@ def newSave(name) -> int:
     saveDict = {
         "name": name,
         "health": 20,
-        "weapon": "Stick",
-        "armor": "Fabric",
+        "weapon": items["Stick"],
+        "armor": items["Fabric"],
         "inventory": [],
         "exp": 0,
         "lv": 0,
@@ -34,7 +37,7 @@ def newSave(name) -> int:
         save.write(data)
     return 0
 
-def savePlayerData(p) -> int:
+def savePlayerData(p: dict) -> int:
     saveName = saveDir + p.name + saveExt
     saveDict = {
         "name": p.name,
@@ -52,7 +55,7 @@ def savePlayerData(p) -> int:
         save.write(data)
     return 0
 
-def loadPlayerData(name) -> dict:
+def loadPlayerData(name: str) -> dict:
     saveName = saveDir + name + saveExt
     try:
         with open(saveName, "r") as save:

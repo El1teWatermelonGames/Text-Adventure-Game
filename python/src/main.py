@@ -1,9 +1,6 @@
 # Code by Elite Watermelon Games
 
 
-# External dependencies
-
-
 # Internal dependencies
 from global_constants import clearConsole
 from save_load import newSave, loadPlayerData, showSaves, showWorlds
@@ -29,15 +26,22 @@ class playerSave:
         print(
             "\nName      %s" % self.name,
             "\nHealth    %s" % self.health,
-            "\nWeapon    %s" % self.weapon,
-            "\nArmor     %s" % self.armor,
+            "\nWeapon    %s" % self.weapon["Name"],
+            "\nArmor     %s" % self.armor["Name"],
             "\nEXP       %s" % self.exp,
             "\nLV        %s" % self.lv,
             "\nLocation  %s" % self.curloc,
-            "\n\nDespite everything, it's still you\n"
         )
+        if self.lv >= 0 and self.lv < 5:
+            print("\nIt's you\n\n")
+        elif self.lv >= 5 and self.lv < 10:
+            print("\nDespite everything, it's still you\n")
+        elif self.lv >= 10 and self.lv < 15:
+            print("\nEvery scar is a medal to your soul\n")
+        elif self.lv >= 15 and self.lv < 20:
+            print("\nHold your head high, Reach for the sky, Never surrender\n")
 
-    def load(self, name) -> None:
+    def load(self, name: str) -> None:
         playerDict = loadPlayerData(name)
         self.name = playerDict["name"]
         self.health = playerDict["health"]
