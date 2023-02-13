@@ -1,7 +1,7 @@
 from os import path, mkdir, scandir
 from json import dumps, loads
 from global_constants import COLOR
-from engine import items
+from engine import items, levelInfo
 saveDir = "saves/"
 saveExt = "_save.json"
 worldDir = "worlds"
@@ -28,7 +28,7 @@ def newSave(name: str) -> int:
         "armor": items["Fabric"],
         "inventory": [],
         "exp": 0,
-        "lv": 0,
+        "lv": levelInfo[0],
         "curloc": "unassigned"
     }
 

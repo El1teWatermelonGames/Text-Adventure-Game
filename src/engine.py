@@ -30,10 +30,143 @@ items = {
     }
 }
 
+# Lvl up formula: (Last Level + Next Level) * 20 * Current Skill Multiplier
+# This could probably be more efficient & will likely end up on r/badcode if anyone finds it
+levelInfo = {
+    0: {
+        "level": 0,
+        "requiredExp": 0,
+        "health": 20,
+        "skillMultiplier": 1
+    },
+    1: {
+        "level": 1,
+        "requiredExp": 63,
+        "health": 22,
+        "skillMultiplier": 1.05
+    },
+    2: {
+        "level": 2,
+        "requiredExp": 173,
+        "health": 25,
+        "skillMultiplier": 1.1
+    },
+    3: {
+        "level": 3,
+        "requiredExp": 334,
+        "health": 29,
+        "skillMultiplier": 1.15
+    },
+    4: {
+        "level": 4,
+        "requiredExp": 550,
+        "health": 34,
+        "skillMultiplier": 1.2
+    },
+    5: {
+        "level": 5,
+        "requiredExp": 825,
+        "health": 40,
+        "skillMultiplier": 1.25
+    },
+    6: {
+        "level": 6,
+        "requiredExp": 1163,
+        "health": 47,
+        "skillMultiplier": 1.3
+    },
+    7: {
+        "level": 7,
+        "requiredExp": 1568,
+        "health": 55,
+        "skillMultiplier": 1.35
+    },
+    8: {
+        "level": 8,
+        "requiredExp": 2044,
+        "health": 64,
+        "skillMultiplier": 1.4
+    },
+    9: {
+        "level": 9,
+        "requiredExp": 2595,
+        "health": 74,
+        "skillMultiplier": 1.45
+    },
+    10: {
+        "level": 10,
+        "requiredExp": 3225,
+        "health": 85,
+        "skillMultiplier": 1.5
+    },
+    11: {
+        "level": 11,
+        "requiredExp": 3938,
+        "health": 97,
+        "skillMultiplier": 1.55
+    },
+    12: {
+        "level": 12,
+        "requiredExp": 4738,
+        "health": 110,
+        "skillMultiplier": 1.6
+    },
+    13: {
+        "level": 13,
+        "requiredExp": 5629,
+        "health": 124,
+        "skillMultiplier": 1.65
+    },
+    14: {
+        "level": 14,
+        "requiredExp": 6615,
+        "health": 139,
+        "skillMultiplier": 1.7
+    },
+    15: {
+        "level": 15,
+        "requiredExp": 7700,
+        "health": 155,
+        "skillMultiplier": 1.75
+    },
+    16: {
+        "level": 16,
+        "requiredExp": 8888, # Google's DNS address, odd coincidence
+        "health": 172,
+        "skillMultiplier": 1.8
+    },
+    17: {
+        "level": 17,
+        "requiredExp": 10183,
+        "health": 190,
+        "skillMultiplier": 1.85
+    },
+    18: {
+        "level": 18,
+        "requiredExp": 11589,
+        "health": 209,
+        "skillMultiplier": 1.9
+    },
+    19: {
+        "level": 19,
+        "requiredExp": 13110,
+        "health": 229,
+        "skillMultiplier": 1.95
+    },
+    20: {
+        "level": 20,
+        "requiredExp": 14750,
+        "health": 250,
+        "skillMultiplier": 2
+    }
+}
+
 def modLoader() -> int:
     if not path.exists(modsDir):
         return 1
     # Load extra items from a .json file & add them to the items dictionary
+    # Load extra sound effects from a .json file & add them to sfx.audio.clips
+    # Load extra music tracks from a .json file & add them to [WIP]
 
 class player:
     def loadData(self, playerDataDict: dict) -> None:
@@ -53,16 +186,16 @@ class player:
             "\nWeapon    %s" % self.weapon["Name"],
             "\nArmor     %s" % self.armor["Name"],
             "\nEXP       %s" % self.exp,
-            "\nLV        %s" % self.lv,
+            "\nLV        %s" % self.lv["level"],
             "\nLocation  %s" % self.curloc,
         )
-        if self.lv >= 0 and self.lv < 5:
-            print("\nIt's you\n")
-        elif self.lv >= 5 and self.lv < 10:
+        if self.lv["level"] == 0 and self.lv["level"] < 10:
+            print("\nIt's you\n\n")
+        elif self.lv["level"] >= 10 and self.lv["level"] < 15:
             print("\nDespite everything, it's still you\n")
-        elif self.lv >= 10 and self.lv < 15:
+        elif self.lv["level"] >= 15 and self.lv["level"] < 20:
             print("\nEvery scar is a medal to your soul\n")
-        elif self.lv >= 15 and self.lv < 20:
+        elif self.lv["level"] == 20:
             print("\nHold your head high, Reach for the sky, Never surrender\n")
 
     def openInventory(self) -> None:
@@ -72,6 +205,7 @@ class player:
             for item in self.inventory:
                 print(item["Name"])
             selection = str(input("\n"))
+            audio.playAudio(audio.clip["menuSelection"])
             command = selection.split(' ')[0]
             if command == 'q':
                 break
@@ -98,7 +232,17 @@ class player:
                 self.inventory.remove(selectedItem)
 
     def expEarn(self, exp: int):
-        pass
+        self.exp += exp
+
+        for i in range(0, len(levelInfo)):
+            if exp >= 1450:
+                self.lv = levelInfo[20]
+                break
+
+            if exp < levelInfo[i]["requiredExp"]:
+                self.lv = levelInfo[i - 1]
+                break
+        
 
 def entry(worldName, playerDict: dict):
     clearConsole()
@@ -109,4 +253,7 @@ def entry(worldName, playerDict: dict):
     player.inventory.append(items["Apple"])
     player.inventory.append(items["Stick"])
     player.inventory.append(items["Fabric"])
+    player.expEarn(player, 50000)
+    player.check(player)
+    input()
     player.openInventory(player)

@@ -1,8 +1,5 @@
 # Code by Elite Watermelon Games
 
-# External Dependancies
-from playsound import playsound
-
 # Internal dependencies
 from global_constants import clearConsole, COLOR
 from save_load import newSave, loadPlayerData, showSaves, showWorlds
@@ -32,16 +29,16 @@ class playerSave:
             "\nWeapon    %s" % self.weapon["Name"],
             "\nArmor     %s" % self.armor["Name"],
             "\nEXP       %s" % self.exp,
-            "\nLV        %s" % self.lv,
+            "\nLV        %s" % self.lv["level"],
             "\nLocation  %s" % self.curloc,
         )
-        if self.lv >= 0 and self.lv < 5:
+        if self.lv["level"] == 0 and self.lv["level"] < 10:
             print("\nIt's you\n\n")
-        elif self.lv >= 5 and self.lv < 10:
+        elif self.lv["level"] >= 10 and self.lv["level"] < 15:
             print("\nDespite everything, it's still you\n")
-        elif self.lv >= 10 and self.lv < 15:
+        elif self.lv["level"] >= 15 and self.lv["level"] < 20:
             print("\nEvery scar is a medal to your soul\n")
-        elif self.lv >= 15 and self.lv < 20:
+        elif self.lv["level"] == 20:
             print("\nHold your head high, Reach for the sky, Never surrender\n")
 
     def load(self, name: str) -> None:
@@ -79,9 +76,8 @@ def TEST_MENU():
             while(True):
                 clip = input()
                 if clip == "q": break
-                try: playsound(audio.clip[clip])
-                except: clearConsole()
-                clearConsole()
+                try: audio.playAudio(audio.clip[clip])
+                except: pass
             print(COLOR["magenta"])
 
     print(COLOR["reset"])
@@ -93,12 +89,14 @@ def main(saveDataSelected = False):
         print("Would you like to:\nq. Exit the game\n1. Create a save\n2. Load a save")
         if saveDataSelected: print("3. Check current save\n4. Start Game")
         selection = input("\n")
+        audio.playAudio(audio.clip["menuSelection"])
 
         if selection == "q":
             exit(0)
 
         elif selection == "1":
             name = input("Name your character: ")
+            audio.playAudio(audio.clip["menuSelection"])
             newSave(name)
             playerSave.load(playerSave, name)
             clearConsole()
@@ -106,6 +104,7 @@ def main(saveDataSelected = False):
         elif selection == "2":
             showSaves()
             dataName = input("\nEnter the name of the save file you want to use: ")
+            audio.playAudio(audio.clip["menuSelection"])
             playerSave.load(playerSave, dataName)
             clearConsole()
 
@@ -116,6 +115,7 @@ def main(saveDataSelected = False):
         elif saveDataSelected and selection == "4":
             showWorlds()
             worldName = input("\nEnter the name of the world you want to play: ")
+            audio.playAudio(audio.clip["menuSelection"])
             entry(worldName, playerSave.exportDataToDict(playerSave))
 
         elif selection == "TEST_MENU":
