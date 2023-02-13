@@ -1,4 +1,5 @@
 from global_constants import COLOR, clearConsole
+from sfx import audio
 from os import path
 
 modsDir = ("mods/")

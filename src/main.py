@@ -1,9 +1,12 @@
 # Code by Elite Watermelon Games
 
+# External Dependancies
+from playsound import playsound
 
 # Internal dependencies
-from global_constants import clearConsole
+from global_constants import clearConsole, COLOR
 from save_load import newSave, loadPlayerData, showSaves, showWorlds
+from sfx import audio
 from engine import entry
 
 
@@ -64,6 +67,25 @@ class playerSave:
             "curloc": self.curloc
         }
 
+def TEST_MENU():
+    print(COLOR["magenta"])
+
+    while(True):
+        selection = input()
+
+        if selection == "q": break
+        elif selection == "AUDIO":
+            print(COLOR["cyan"])
+            while(True):
+                clip = input()
+                if clip == "q": break
+                try: playsound(audio.clip[clip])
+                except: clearConsole()
+                clearConsole()
+            print(COLOR["magenta"])
+
+    print(COLOR["reset"])
+    clearConsole()
 
 def main(saveDataSelected = False):
     while(True):
@@ -95,6 +117,9 @@ def main(saveDataSelected = False):
             showWorlds()
             worldName = input("\nEnter the name of the world you want to play: ")
             entry(worldName, playerSave.exportDataToDict(playerSave))
+
+        elif selection == "TEST_MENU":
+            TEST_MENU()
         
         if playerSave.name != None: saveDataSelected = True
 
