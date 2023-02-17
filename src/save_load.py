@@ -1,15 +1,19 @@
 from os import path, mkdir, scandir
 from json import dumps, loads
 from global_constants import COLOR
-from engine import items, levelInfo
+from lookup import items, levelInfo
 saveDir = "saves/"
 saveExt = "_save.json"
-worldDir = "worlds"
+worldDir = "worlds/"
 worldExt = "_world.py"
+modDir = "mods/"
+modExt = "_mod.json"
 if not path.exists(saveDir):
     mkdir(saveDir)
 if not path.exists(worldDir):
     mkdir(worldDir)
+if not path.exists(modDir):
+    mkdir(modDir)
 
 def newSave(name: str) -> int:
     saveName = saveDir + name + saveExt
@@ -85,3 +89,41 @@ def showWorlds() -> None:
             print(COLOR["blue"] + path.name.rstrip(worldExt) + COLOR["reset"])
     if numofValidWorlds == 0:
         print(COLOR["red"]+"No worlds found!"+COLOR["reset"])
+
+def showMods() -> None:
+    numofValidMods = 0
+    modNames = []
+    for path in scandir(modDir):
+        if path.is_file() and path.name.endswith(modExt):
+            numofValidMods += 1
+            modNames.append(COLOR["blue"] + path.name.rstrip(modExt) + COLOR["reset"])
+    if numofValidMods == 0:
+        print(COLOR["red"] + "No mods are installed!\n" + COLOR["reset"])
+        return 0
+    print("Listed below are all your installed mods:")
+    for modName in modNames:
+        print(modName)
+    print()
+
+def modLoader() -> None:
+    for path in scandir(modDir):
+        if path.is_file() and path.name.endswith(modExt):
+            with open(modDir + path.name, "r") as modFile:
+                modDict = loads(' '.join(modFile.readlines()).replace("\n", ""))
+
+            # Load items
+            modItems = loads(dumps(modDict["items"]))
+            print(modItems)
+            for modItem in modItems.items():
+                modItem = ''.join(map(str, modItem))
+                for i in range(len(modItem)):
+                    if modItem[i] == '{':
+                        modItem = modItem[i:]
+                        break
+                modItemDict = loads(modItem.replace('\'', '"'))
+                print(type(modItem), "\n", modItem)
+                items[modItemDict["Name"]] = modItemDict
+
+    modItemOutput = open("mods/itemsLog.txt", "w")
+    modItemOutput.write(dumps(items, indent=4))
+    modItemOutput.close()

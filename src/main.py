@@ -2,14 +2,12 @@
 
 # Internal dependencies
 from global_constants import clearConsole, COLOR
-from save_load import newSave, loadPlayerData, showSaves, showWorlds
-from sfx import audio
+from save_load import newSave, loadPlayerData, showSaves, showWorlds, showMods
 from engine import entry
 
 
 # Initialization
 clearConsole()
-
 
 class playerSave:
     def init(self) -> None:
@@ -71,14 +69,6 @@ def TEST_MENU():
         selection = input()
 
         if selection == "q": break
-        elif selection == "AUDIO":
-            print(COLOR["cyan"])
-            while(True):
-                clip = input()
-                if clip == "q": break
-                try: audio.playAudio(audio.clip[clip])
-                except: pass
-            print(COLOR["magenta"])
 
     print(COLOR["reset"])
     clearConsole()
@@ -86,17 +76,15 @@ def TEST_MENU():
 def main(saveDataSelected = False):
     while(True):
         if saveDataSelected: print("Current save selected: %s" % playerSave.name)
-        print("Would you like to:\nq. Exit the game\n1. Create a save\n2. Load a save")
-        if saveDataSelected: print("3. Check current save\n4. Start Game")
+        print("Would you like to:\nq. Exit the game\n1. Create a save\n2. Load a save\n3. Show Installed Mods")
+        if saveDataSelected: print("4. Check current save\n5. Start Game")
         selection = input("\n")
-        audio.playAudio(audio.clip["menuSelection"])
 
         if selection == "q":
             exit(0)
 
         elif selection == "1":
             name = input("Name your character: ")
-            audio.playAudio(audio.clip["menuSelection"])
             newSave(name)
             playerSave.load(playerSave, name)
             clearConsole()
@@ -104,18 +92,20 @@ def main(saveDataSelected = False):
         elif selection == "2":
             showSaves()
             dataName = input("\nEnter the name of the save file you want to use: ")
-            audio.playAudio(audio.clip["menuSelection"])
             playerSave.load(playerSave, dataName)
             clearConsole()
 
-        elif saveDataSelected and selection == "3":
+        elif selection == "3":
+            clearConsole()
+            showMods()
+
+        elif saveDataSelected and selection == "4":
             clearConsole()
             playerSave.check(playerSave)
 
-        elif saveDataSelected and selection == "4":
+        elif saveDataSelected and selection == "5":
             showWorlds()
             worldName = input("\nEnter the name of the world you want to play: ")
-            audio.playAudio(audio.clip["menuSelection"])
             entry(worldName, playerSave.exportDataToDict(playerSave))
 
         elif selection == "TEST_MENU":
