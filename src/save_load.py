@@ -33,7 +33,10 @@ def newSave(name: str) -> int:
         "inventory": [],
         "exp": 0,
         "lv": levelInfo[0],
-        "curloc": "unassigned"
+        "curloc": {
+            "name": "unassigned",
+            "SUID": "64:0000-0000-0000-0000"
+        }
     }
 
     data = dumps(saveDict, indent=2)
@@ -51,7 +54,7 @@ def savePlayerData(p: dict) -> int:
         "inventory": p.inventory,
         "exp": p.exp,
         "lv": p.level,
-        "curloc": p.curl
+        "curloc": p.curloc
     }
 
     data = dumps(saveDict, indent=2)
@@ -105,13 +108,15 @@ def showMods() -> None:
         print(modName)
     print()
 
-def modLoader() -> None:
+def modLoader() -> tuple:
     for path in scandir(modDir):
         if path.is_file() and path.name.endswith(modExt):
-            with open(modDir + path.name, "r") as modFile:
-                modDict = loads(' '.join(modFile.readlines()).replace("\n", ""))
+            try:
+                with open(modDir + path.name, "r") as modFile:
+                    modDict = loads(' '.join(modFile.readlines()).replace("\n", ""))
+            except:
+                return(1, "Couldn't access mod file: %s" % path.name)
 
-            # Load items
             modItems = loads(dumps(modDict["items"]))
             print(modItems)
             for modItem in modItems.items():
@@ -122,8 +127,13 @@ def modLoader() -> None:
                         break
                 modItemDict = loads(modItem.replace('\'', '"'))
                 print(type(modItem), "\n", modItem)
-                items[modItemDict["Name"]] = modItemDict
+                try:
+                    items[modItemDict["Name"]] = modItemDict
+                except:
+                    return(1, "Couldn't add mod items to global lookup")
 
     modItemOutput = open("mods/itemsLog.txt", "w")
-    modItemOutput.write(dumps(items, indent=4))
+    modItemOutput.write(dumps(items, indent=2))
     modItemOutput.close()
+
+    return(0, "")

@@ -1,45 +1,53 @@
+from importlib.machinery import SourceFileLoader
+
 from global_constants import COLOR, clearConsole
-from os import path
 from lookup import items, levelInfo
 from save_load import modLoader
 
-modsDir = ("mods/")
-
 class player:
-    def loadData(self, playerDataDict: dict) -> None:
-        self.name = playerDataDict["name"]
-        self.health = playerDataDict["health"]
-        self.weapon = playerDataDict["weapon"]
-        self.armor = playerDataDict["armor"]
-        self.inventory = playerDataDict["inventory"]
-        self.exp = playerDataDict["exp"]
-        self.lv = playerDataDict["lv"]
-        self.curloc = playerDataDict["curloc"]
+    name = None
+    health = None
+    weapon = None
+    armor = None
+    inventory = None
+    exp = None
+    lv = None
+    curloc = None
 
-    def check(self) -> None:
+    def loadData(playerDataDict: dict) -> None:
+        player.name = playerDataDict["name"]
+        player.health = playerDataDict["health"]
+        player.weapon = playerDataDict["weapon"]
+        player.armor = playerDataDict["armor"]
+        player.inventory = playerDataDict["inventory"]
+        player.exp = playerDataDict["exp"]
+        player.lv = playerDataDict["lv"]
+        player.curloc = playerDataDict["curloc"]
+
+    def check() -> None:
         print(
-            "\nName      %s" % self.name,
-            "\nHealth    %s" % self.health,
-            "\nWeapon    %s" % self.weapon["Name"],
-            "\nArmor     %s" % self.armor["Name"],
-            "\nEXP       %s" % self.exp,
-            "\nLV        %s" % self.lv["level"],
-            "\nLocation  %s" % self.curloc,
+            "\nName      %s" % player.name,
+            "\nHealth    %s" % player.health,
+            "\nWeapon    %s" % player.weapon["Name"],
+            "\nArmor     %s" % player.armor["Name"],
+            "\nEXP       %s" % player.exp,
+            "\nLV        %s" % player.lv["level"],
+            "\nLocation  %s" % player.curloc,
         )
-        if self.lv["level"] == 0 and self.lv["level"] < 10:
+        if player.lv["level"] == 0 and player.lv["level"] < 10:
             print("\nIt's you\n\n")
-        elif self.lv["level"] >= 10 and self.lv["level"] < 15:
+        elif player.lv["level"] >= 10 and player.lv["level"] < 15:
             print("\nDespite everything, it's still you\n")
-        elif self.lv["level"] >= 15 and self.lv["level"] < 20:
+        elif player.lv["level"] >= 15 and player.lv["level"] < 20:
             print("\nEvery scar is a medal to your soul\n")
-        elif self.lv["level"] == 20:
+        elif player.lv["level"] == 20:
             print("\nHold your head high, Reach for the sky, Never surrender\n")
 
-    def openInventory(self) -> None:
+    def openInventory() -> None:
         while(True):
             print("Type a command then the item you want to affect")
             print("Commands: c - Check item | u - Use item | d - Discard item | q - Close inventory")
-            for item in self.inventory:
+            for item in player.inventory:
                 print(item["Name"])
             selection = str(input("\n"))
             command = selection.split(' ')[0]
@@ -48,7 +56,7 @@ class player:
             itemSelection = selection.split(' ')[1]
             selectedItem = items.get(itemSelection)
 
-            if selectedItem not in self.inventory:
+            if selectedItem not in player.inventory:
                 clearConsole()
                 print(COLOR["red"] + f"You don't have this item ({itemSelection})!" + COLOR["reset"])
             elif command == 'c':
@@ -65,48 +73,46 @@ class player:
                 pass
             elif command == 'd':
                 clearConsole()
-                self.inventory.remove(selectedItem)
+                player.inventory.remove(selectedItem)
 
-    def expEarn(self, exp: int):
-        self.exp += exp
+    def expEarn(exp: int):
+        player.exp += exp
 
         for i in range(0, len(levelInfo)):
             if exp >= 1450:
-                self.lv = levelInfo[20]
+                player.lv = levelInfo[20]
                 break
 
             if exp < levelInfo[i]["requiredExp"]:
-                self.lv = levelInfo[i - 1]
+                player.lv = levelInfo[i - 1]
                 break
 
-    def changeWeapon(self, newWeapon: dict):
-        self.inventory.append(self.weapon)
-        self.weapon = newWeapon
-        self.inventory.remove(newWeapon)
+    def changeWeapon(newWeapon: dict):
+        player.inventory.append(player.weapon)
+        player.weapon = newWeapon
+        player.inventory.remove(newWeapon)
 
-    def changeArmor(self, newArmor: dict):
-        self.inventory.append(self.armor)
-        self.armor = newArmor
-        self.inventory.remove(newArmor)
+    def changeArmor(newArmor: dict):
+        player.inventory.append(player.armor)
+        player.armor = newArmor
+        player.inventory.remove(newArmor)
 
-    def giveItem(self, itemName: str):
-        self.inventory.append(items[itemName])
+    def giveItem(itemName: str):
+        player.inventory.append(items[itemName])
 
-    def removeItem(self, itemName: str):
-        self.inventory.remove(items[itemName])
+    def removeItem(itemName: str):
+        player.inventory.remove(items[itemName])
         
+def checkLocationsSUID(world, playerLocationSUID: str) -> bool:
+    for location in world.locations:
+        if location["SUID"] == playerLocationSUID:
+            return True
+    return False
 
-def entry(worldName, playerDict: dict):
+def entry(worldName: str, playerDict: dict):
     clearConsole()
-    player.loadData(player, playerDict)
-    modLoader()
-
-    input()
+    player.loadData(playerDict)
+    world = SourceFileLoader("world", "worlds/%s" % worldName + "_world.py").load_module()
     
-    player.inventory.append(items["Apple"])
-    player.inventory.append(items["Stick"])
-    player.inventory.append(items["Fabric"])
-    player.expEarn(player, 34)
-    player.check(player)
-    input()
-    player.openInventory(player)
+    if player.curloc["SUID"] == "64:0000-0000-0000-0000" or not checkLocationsSUID(world, player.curloc["SUID"]):
+        player.curloc = world.startLocation

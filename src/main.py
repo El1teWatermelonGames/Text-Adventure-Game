@@ -1,65 +1,61 @@
-# Code by Elite Watermelon Games
-
 # Internal dependencies
 from global_constants import clearConsole, COLOR
-from save_load import newSave, loadPlayerData, showSaves, showWorlds, showMods
+from save_load import newSave, loadPlayerData, showSaves, showWorlds, showMods, modLoader
 from engine import entry
-
 
 # Initialization
 clearConsole()
 
 class playerSave:
-    def init(self) -> None:
-        self.name = None
-        self.health = None
-        self.weapon = None
-        self.armor = None
-        self.inventory = None
-        self.exp = None
-        self.lv = None
-        self.curloc = None
+    name = None
+    health = None
+    weapon = None
+    armor = None
+    inventory = None
+    exp = None
+    lv = None
+    curloc = None
 
-    def check(self) -> None:
+    def check() -> None:
         print(
-            "\nName      %s" % self.name,
-            "\nHealth    %s" % self.health,
-            "\nWeapon    %s" % self.weapon["Name"],
-            "\nArmor     %s" % self.armor["Name"],
-            "\nEXP       %s" % self.exp,
-            "\nLV        %s" % self.lv["level"],
-            "\nLocation  %s" % self.curloc,
+            "\nName      %s" % playerSave.name,
+            "\nHealth    %s" % playerSave.health,
+            "\nWeapon    %s" % playerSave.weapon["Name"],
+            "\nArmor     %s" % playerSave.armor["Name"],
+            "\nEXP       %s" % playerSave.exp,
+            "\nLV        %s" % playerSave.lv["level"],
+            "\nLocation  %s" % playerSave.curloc,
         )
-        if self.lv["level"] == 0 and self.lv["level"] < 10:
+        if playerSave.lv["level"] == 0 and playerSave.lv["level"] < 10:
             print("\nIt's you\n\n")
-        elif self.lv["level"] >= 10 and self.lv["level"] < 15:
+        elif playerSave.lv["level"] >= 10 and playerSave.lv["level"] < 15:
             print("\nDespite everything, it's still you\n")
-        elif self.lv["level"] >= 15 and self.lv["level"] < 20:
+        elif playerSave.lv["level"] >= 15 and playerSave.lv["level"] < 20:
             print("\nEvery scar is a medal to your soul\n")
-        elif self.lv["level"] == 20:
+        elif playerSave.lv["level"] == 20:
             print("\nHold your head high, Reach for the sky, Never surrender\n")
 
-    def load(self, name: str) -> None:
+    def load(name: str) -> None:
         playerDict = loadPlayerData(name)
-        self.name = playerDict["name"]
-        self.health = playerDict["health"]
-        self.weapon = playerDict["weapon"]
-        self.armor = playerDict["armor"]
-        self.inventory = playerDict["inventory"]
-        self.exp = playerDict["exp"]
-        self.lv = playerDict["lv"]
-        self.curloc = playerDict["curloc"]
+        playerSave.name = playerDict["name"]
+        playerSave.health = playerDict["health"]
+        playerSave.weapon = playerDict["weapon"]
+        playerSave.armor = playerDict["armor"]
+        playerSave.inventory = playerDict["inventory"]
+        playerSave.exp = playerDict["exp"]
+        playerSave.lv = playerDict["lv"]
+        playerSave.curloc = playerDict["curloc"]
 
-    def exportDataToDict(self) -> dict:
+    def exportDataToDict() -> dict:
         return {
-            "name": self.name,
-            "health": self.health,
-            "weapon": self.weapon,
-            "armor": self.armor,
-            "inventory": self.inventory,
-            "exp": self.exp,
-            "lv": self.lv,
-            "curloc": self.curloc
+            "name": playerSave.name,
+            "health": playerSave.health,
+            "weapon": playerSave.weapon,
+            "armor": playerSave.armor,
+            "inventory": playerSave.inventory,
+            "exp": playerSave.exp,
+            "lv": playerSave.lv,
+            "curloc": playerSave.curloc
         }
 
 def TEST_MENU():
@@ -86,13 +82,13 @@ def main(saveDataSelected = False):
         elif selection == "1":
             name = input("Name your character: ")
             newSave(name)
-            playerSave.load(playerSave, name)
+            playerSave.load(name)
             clearConsole()
 
         elif selection == "2":
             showSaves()
             dataName = input("\nEnter the name of the save file you want to use: ")
-            playerSave.load(playerSave, dataName)
+            playerSave.load(dataName)
             clearConsole()
 
         elif selection == "3":
@@ -101,12 +97,12 @@ def main(saveDataSelected = False):
 
         elif saveDataSelected and selection == "4":
             clearConsole()
-            playerSave.check(playerSave)
+            playerSave.check()
 
         elif saveDataSelected and selection == "5":
             showWorlds()
             worldName = input("\nEnter the name of the world you want to play: ")
-            entry(worldName, playerSave.exportDataToDict(playerSave))
+            entry(worldName, playerSave.exportDataToDict())
 
         elif selection == "TEST_MENU":
             TEST_MENU()
@@ -115,5 +111,8 @@ def main(saveDataSelected = False):
 
 
 if __name__ == "__main__":
-    playerSave.init(playerSave)
+    status:tuple = modLoader()
+    if not status[0] == 0:
+        print(COLOR["red"] + status[1] + COLOR["reset"])
+        exit(status[0])
     main()
